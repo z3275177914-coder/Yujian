@@ -1,7 +1,7 @@
 import SwiftUI
 
 @MainActor
-struct ViewerCommands: Commands {
+struct ViewerCommands: @preconcurrency Commands {
     @ObservedObject var model: ImageViewerModel
 
     var body: some Commands {
