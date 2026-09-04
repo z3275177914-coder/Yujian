@@ -1,7 +1,8 @@
 import ImageViewerCore
 import SwiftUI
 
-struct SettingsView: View {
+@MainActor
+struct SettingsView: @preconcurrency View {
     @ObservedObject var model: ImageViewerModel
     @State private var apiKey = ""
     @State private var modelName = ""
@@ -260,7 +261,8 @@ struct SettingsView: View {
     }
 }
 
-private struct ShortcutRow: View {
+@MainActor
+private struct ShortcutRow: @preconcurrency View {
     let title: String
     let value: String
     let action: ShortcutAction
