@@ -163,6 +163,7 @@ final class MotionPhotoPlaybackController: NSObject {
         }
 
         let item = AVPlayerItem(url: videoURL)
+        let itemID = ObjectIdentifier(item)
         let player = AVPlayer(playerItem: item)
         player.actionAtItemEnd = .pause
         // Preserve the existing viewer's silent-preview policy. No custom
@@ -199,7 +200,7 @@ final class MotionPhotoPlaybackController: NSObject {
                 Task { @MainActor [weak self] in
                     guard let self,
                           self.playbackGeneration == generation,
-                          self.player?.currentItem === item else {
+                          self.player?.currentItem.map(ObjectIdentifier.init) == itemID else {
                         return
                     }
                     self.showReadyFrame()
