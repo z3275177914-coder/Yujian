@@ -2,7 +2,8 @@ import AppKit
 import ImageViewerCore
 import SwiftUI
 
-struct InspectorView: View {
+@MainActor
+struct InspectorView: @preconcurrency View {
     @EnvironmentObject private var model: ImageViewerModel
     @EnvironmentObject private var pixelSampleStore: PixelSampleStore
 
