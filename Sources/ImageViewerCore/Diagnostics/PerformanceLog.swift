@@ -1,4 +1,4 @@
-import OSLog
+@preconcurrency import OSLog
 
 public enum PerformanceLog {
     public static let subsystem = ImageViewerAppIdentity.bundleIdentifier
