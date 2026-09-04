@@ -2,7 +2,8 @@ import AppKit
 import ImageViewerCore
 import SwiftUI
 
-struct ThumbnailSidebarView: View {
+@MainActor
+struct ThumbnailSidebarView: @preconcurrency View {
     @EnvironmentObject private var model: ImageViewerModel
 
     var body: some View {
@@ -126,7 +127,8 @@ struct ThumbnailSidebarView: View {
     }
 }
 
-private struct ThumbnailRow: View {
+@MainActor
+private struct ThumbnailRow: @preconcurrency View {
     let asset: ImageAsset
     let isSelected: Bool
     let action: () -> Void
@@ -190,7 +192,8 @@ private struct ThumbnailRow: View {
     }
 }
 
-private struct GalleryThumbnail: View {
+@MainActor
+private struct GalleryThumbnail: @preconcurrency View {
     let asset: ImageAsset
     let isSelected: Bool
     let action: () -> Void
