@@ -34,6 +34,6 @@ jobs:
       - name: Check scripts and release contracts
         run: |
           zsh -n Scripts/*.sh
-          rg -q 'Scripts/package-release.sh' Sources Scripts Docs
-          rg -q 'Scripts/verify-release-app.sh' Sources Scripts Docs
+          grep -R -q 'Scripts/package-release.sh' Sources Scripts Docs
+          grep -R -q 'Scripts/verify-release-app.sh' Sources Scripts Docs
           git diff --check
