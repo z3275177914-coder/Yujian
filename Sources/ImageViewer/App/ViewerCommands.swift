@@ -1,5 +1,6 @@
 import SwiftUI
 
+@MainActor
 struct ViewerCommands: Commands {
     @ObservedObject var model: ImageViewerModel
 
