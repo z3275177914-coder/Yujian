@@ -3,7 +3,8 @@ import ImageViewerCore
 import SwiftUI
 import UniformTypeIdentifiers
 
-struct ContentView: View {
+@MainActor
+struct ContentView: @preconcurrency View {
     @EnvironmentObject private var model: ImageViewerModel
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     private let initialURL: URL?
