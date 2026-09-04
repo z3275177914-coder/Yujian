@@ -1,7 +1,8 @@
 import ImageViewerCore
 import SwiftUI
 
-struct ExportPanelView: View {
+@MainActor
+struct ExportPanelView: @preconcurrency View {
     @EnvironmentObject private var model: ImageViewerModel
     @Environment(\.dismiss) private var dismiss
 
@@ -122,7 +123,8 @@ struct ExportPanelView: View {
     }
 }
 
-struct BatchRenamePanelView: View {
+@MainActor
+struct BatchRenamePanelView: @preconcurrency View {
     @EnvironmentObject private var model: ImageViewerModel
     @Environment(\.dismiss) private var dismiss
 
