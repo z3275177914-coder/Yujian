@@ -112,6 +112,43 @@ final class ImageCanvasNSView: NSView {
         }
     }
 
+    // Dispatch sources are safe here because every operation is scheduled on
+    // the main queue, but DispatchSourceTimer is not marked Sendable by the
+    // SDK. Keep that implementation detail behind a small, audited wrapper so
+    // the nonisolated NSObject deinitializer can still release timers safely.
+    private final class CanvasTimer: @unchecked Sendable {
+        private let source: DispatchSourceTimer
+
+        init() {
+            source = DispatchSource.makeTimerSource(queue: .main)
+        }
+
+        func setEventHandler(_ handler: @escaping () -> Void) {
+            source.setEventHandler(handler: handler)
+        }
+
+        func schedule(
+            deadline: DispatchTime,
+            repeating: DispatchTimeInterval,
+            leeway: DispatchTimeInterval
+        ) {
+            source.schedule(
+                deadline: deadline,
+                repeating: repeating,
+                leeway: leeway
+            )
+        }
+
+        func resume() {
+            source.resume()
+        }
+
+        func cancel() {
+            source.setEventHandler {}
+            source.cancel()
+        }
+    }
+
     var image: CGImage? {
         didSet {
             let imageChanged: Bool
@@ -316,10 +353,10 @@ final class ImageCanvasNSView: NSView {
     private var selectionStartPoint: CGPoint?
     private var selectionPreview: CGRect?
     private var renderQualityState = CanvasRenderQualityState()
-    private var settledRenderTimer: DispatchSourceTimer?
-    private var interactiveOverlayTimer: DispatchSourceTimer?
+    private var settledRenderTimer: CanvasTimer?
+    private var interactiveOverlayTimer: CanvasTimer?
     private var pendingNativeZoom: CGFloat?
-    private var zoomCommitTimer: DispatchSourceTimer?
+    private var zoomCommitTimer: CanvasTimer?
     private var lastModelZoomFactor: CGFloat = 1
     private var detailProvider: ImageTileProvider?
     private var detailDescriptor: ImageTileDescriptor?
@@ -353,11 +390,8 @@ final class ImageCanvasNSView: NSView {
     }
 
     deinit {
-        settledRenderTimer?.setEventHandler {}
         settledRenderTimer?.cancel()
-        interactiveOverlayTimer?.setEventHandler {}
         interactiveOverlayTimer?.cancel()
-        zoomCommitTimer?.setEventHandler {}
         zoomCommitTimer?.cancel()
     }
 
@@ -860,7 +894,7 @@ final class ImageCanvasNSView: NSView {
               interactiveOverlayTimer == nil else {
             return
         }
-        let timer = DispatchSource.makeTimerSource(queue: .main)
+        let timer = CanvasTimer()
         timer.setEventHandler { [weak self] in
             guard let self,
                   self.renderQualityState.phase == .interactive else {
@@ -1240,7 +1274,7 @@ final class ImageCanvasNSView: NSView {
 
     private func scheduleSettledRendering() {
         if settledRenderTimer == nil {
-            let timer = DispatchSource.makeTimerSource(queue: .main)
+            let timer = CanvasTimer()
             timer.setEventHandler { [weak self] in
                 self?.finishSettledRendering()
             }
@@ -1313,7 +1347,7 @@ final class ImageCanvasNSView: NSView {
 
     private func scheduleZoomNotification() {
         if zoomCommitTimer == nil {
-            let timer = DispatchSource.makeTimerSource(queue: .main)
+            let timer = CanvasTimer()
             timer.setEventHandler { [weak self] in
                 self?.commitZoomNotification()
             }
